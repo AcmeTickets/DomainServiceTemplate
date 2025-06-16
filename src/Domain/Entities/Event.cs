@@ -1,7 +1,7 @@
-using EventManagement.Domain.Events;
+using {{DomainName}}.Domain.Events;
 using Newtonsoft.Json;
 
-namespace EventManagement.Domain.Entities;
+namespace {{DomainName}}.Domain.Entities;
 
 public class Event
 {
@@ -36,7 +36,6 @@ public class Event
         if (Status != EventStatus.Active)
             throw new InvalidOperationException("Only active events can be expired.");
         Status = EventStatus.Expired;
-        AddDomainEvent(new EventExpiredEvent(Id));
     }
 
     public void Close()
@@ -44,7 +43,6 @@ public class Event
         if (Status != EventStatus.Active)
             throw new InvalidOperationException("Only active events can be closed.");
         Status = EventStatus.Closed;
-        AddDomainEvent(new EventClosedEvent(Id));
     }
 
     private void AddDomainEvent(DomainEvent domainEvent)

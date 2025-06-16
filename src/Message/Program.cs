@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
-using EventManagement.Infrastructure;
+using {{DomainName}}.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using EventManagement.Application.Services;
-using EventManagement.Infrastructure.Services;
-using EventManagement.Domain.Repositories;
-using EventManagement.Domain.Services;
+using {{DomainName}}.Application.Services;
+using {{DomainName}}.Infrastructure.Services;
+using {{DomainName}}.Domain.Repositories;
+using {{DomainName}}.Domain.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing; // For IEndpointRouteBuilder
 using Microsoft.Extensions.Diagnostics.HealthChecks; // For HealthCheckOptions
@@ -21,18 +21,19 @@ builder.Logging.AddConsole();
 // Add ASP.NET Core services for health checks
 builder.Services.AddHealthChecks();
 
+var endpointName = "{{DomainName}}.Message";
 // NServiceBus endpoint configuration
 var endpointConfig = builder.Environment.IsDevelopment()
     ? NServiceBusConfigurator.DevelopmentConfiguration(
         builder.Configuration,
-        "EventManagement.Message",
+        endpointName,
         routingSettings =>
         {
             // Configure routing for events if needed
         })
     : NServiceBusConfigurator.ProductionConfiguration(
         builder.Configuration,
-        "EventManagement.Message",
+        endpointName,
         routingSettings =>
         {
             // Configure routing for events if needed
@@ -65,7 +66,7 @@ var healthCheckTask = Task.Run(() =>
 
 // Log startup
 var logger = host.Services.GetRequiredService<ILogger<Program>>();
-logger.LogInformation("Starting host for endpoint EventManagement.Message");
+logger.LogInformation("Starting host for endpoint endpointName.Message");
 
 await host.RunAsync();
 await healthCheckTask;
@@ -92,7 +93,7 @@ public class NServiceBusHostedService : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting NServiceBus endpoint EventManagement.Message");
+        _logger.LogInformation("Starting NServiceBus endpoint {{DomainName}}.Message");
         _endpointInstance = await _endpoint.Start(_serviceProvider, cancellationToken);
         _isHealthy = true;
         _logger.LogInformation("NServiceBus endpoint started successfully");
@@ -102,7 +103,7 @@ public class NServiceBusHostedService : IHostedService
     {
         if (_endpointInstance != null)
         {
-            _logger.LogInformation("Stopping NServiceBus endpoint EventManagement.Message");
+            _logger.LogInformation("Stopping NServiceBus endpoint {{DomainName}}.Message");
             await _endpointInstance.Stop();
             _isHealthy = false;
             _logger.LogInformation("NServiceBus endpoint stopped successfully");

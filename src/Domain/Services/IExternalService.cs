@@ -1,4 +1,4 @@
-namespace EventManagement.Domain.Services;
+namespace {{DomainName}}.Domain.Services;
 
 public interface IExternalService
 {

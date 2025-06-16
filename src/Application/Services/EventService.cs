@@ -1,11 +1,11 @@
-using EventManagement.Application.Commands;
-using EventManagement.Application.DTOs;
-using EventManagement.Domain.Repositories;
-using EventManagement.Domain.Services;
-using EventManagement.Domain.Entities;
-using EventManagement.Domain.Events;
+using {{DomainName}}.Application.Commands;
+using {{DomainName}}.Application.DTOs;
+using {{DomainName}}.Domain.Repositories;
+using {{DomainName}}.Domain.Services;
+using {{DomainName}}.Domain.Entities;
+using {{DomainName}}.Domain.Events;
 
-namespace EventManagement.Application.Services;
+namespace {{DomainName}}.Application.Services;
 
 public class EventService : IEventService
 {
@@ -45,17 +45,10 @@ public class EventService : IEventService
         evt.Expire();
         await _eventRepository.UpdateAsync(evt, cancellationToken);
 
-        // TODO: Implement outbox pattern by persisting domain events to Cosmos DB
+        // Only publish domain events if needed for the template
         foreach (var domainEvent in evt.DomainEvents)
         {
             // Placeholder: Publish to messaging system
-            if (domainEvent is EventExpiredEvent expiredEvent)
-            {
-                await _externalService.NotifyEventStatusAsync(
-                    expiredEvent.EventId,
-                    "Expired",
-                    cancellationToken);
-            }
         }
         evt.ClearDomainEvents();
     }
@@ -69,17 +62,10 @@ public class EventService : IEventService
         evt.Close();
         await _eventRepository.UpdateAsync(evt, cancellationToken);
 
-        // TODO: Implement outbox pattern by persisting domain events to Cosmos DB
+        // Only publish domain events if needed for the template
         foreach (var domainEvent in evt.DomainEvents)
         {
             // Placeholder: Publish to messaging system
-            if (domainEvent is EventClosedEvent closedEvent)
-            {
-                await _externalService.NotifyEventStatusAsync(
-                    closedEvent.EventId,
-                    "Closed",
-                    cancellationToken);
-            }
         }
         evt.ClearDomainEvents();
     }

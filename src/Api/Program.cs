@@ -1,12 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NServiceBus;
-using EventManagement.Application.Services;
-using EventManagement.Infrastructure;
-using EventManagement.Infrastructure.Services;
-using EventManagement.Domain.Repositories;
-using EventManagement.Domain.Services;
-using EventManagement.Domain.Events;
+using {{DomainName}}.Application.Services;
+using {{DomainName}}.Infrastructure;
+using {{DomainName}}.Infrastructure.Services;
+using {{DomainName}}.Domain.Repositories;
+using {{DomainName}}.Domain.Services;
+using {{DomainName}}.Domain.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,8 +69,7 @@ await app.RunAsync();
 // NServiceBus configuration helper
 EndpointConfiguration ConfigureNServiceBus(WebApplicationBuilder builder)
 {
-    var endpointName = "EventManagement.Api";
-    var messageEndpoint = "EventManagement.Message";
+    var endpointName = "{{DomainName}}.Api";
     return builder.Environment.IsDevelopment()
         ? NServiceBusConfigurator.DevelopmentConfiguration(
             builder.Configuration,

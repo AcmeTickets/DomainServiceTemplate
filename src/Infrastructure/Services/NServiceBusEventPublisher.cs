@@ -1,7 +1,7 @@
-using EventManagement.Application.Services;
+using {{DomainName}}.Application.Services;
 using NServiceBus;
 
-namespace EventManagement.Infrastructure.Services;
+namespace {{DomainName}}.Infrastructure.Services;
 
 public class NServiceBusEventPublisher : ISenderService
 {

@@ -1,7 +1,7 @@
-using EventManagement.Application.Commands;
-using EventManagement.Application.DTOs;
+using {{DomainName}}.Application.Commands;
+using {{DomainName}}.Application.DTOs;
 
-namespace EventManagement.Application.Services;
+namespace {{DomainName}}.Application.Services;
 
 public interface IEventService
 {

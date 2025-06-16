@@ -21,7 +21,7 @@ jobs:
       project_path: src/Api/Api.csproj
       dockerfile_path: src/Api/Dockerfile
       image_name: ghcr.io/acmetickets/{{DomainShortName}}-api
-      target_port: 5271
+      target_port: {{api_port}}
 
   deploy-api:
     needs: build-and-publish-api
@@ -30,7 +30,7 @@ jobs:
     with:
       image_tag: ${{ needs.build-and-publish-api.outputs.image_tag }}
       container_app_name: {{DomainShortName}}-api
-      target_port: 5271
+      target_port: {{api_port}}
 
   build-and-publish-message:
     uses: AcmeTickets/.github/.github/workflows/Build and Publish Docker Image.yml@main
@@ -39,6 +39,8 @@ jobs:
       project_path: src/Message/Message.csproj
       dockerfile_path: src/Message/Dockerfile
       image_name: ghcr.io/acmetickets/{{DomainShortName}}-msg
+      # If there is a port for message, use {{msg_port}}
+      # If there is a Cosmos DB account, use {{cosmosdb_account}}
 
   deploy-message:
     needs: build-and-publish-message
@@ -47,3 +49,5 @@ jobs:
     with:
       image_tag: ${{ needs.build-and-publish-message.outputs.image_tag }}
       container_app_name: {{DomainShortName}}-msg
+      # If there is a port for message, use {{msg_port}}
+      # If there is a Cosmos DB account, use {{cosmosdb_account}}

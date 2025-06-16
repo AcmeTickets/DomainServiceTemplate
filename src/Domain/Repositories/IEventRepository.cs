@@ -1,6 +1,6 @@
-using EventManagement.Domain.Entities;
+using {{DomainName}}.Domain.Entities;
 
-namespace EventManagement.Domain.Repositories;
+namespace {{DomainName}}.Domain.Repositories;
 
 public interface IEventRepository
 {

@@ -1,6 +1,6 @@
-using EventManagement.Application.Services;
+using {{DomainName}}.Application.Services;
 
-namespace EventManagement.Test.Mocks.Fakes;
+namespace {{DomainName}}.Test.Mocks.Fakes;
 
 public class FakeSenderService : ISenderService
 {

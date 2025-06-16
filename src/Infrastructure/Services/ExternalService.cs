@@ -1,8 +1,8 @@
-using EventManagement.Domain.Services;
+using {{DomainName}}.Domain.Services;
 using System.Net.Http;
 using System.Text.Json;
 
-namespace EventManagement.Infrastructure.Services;
+namespace {{DomainName}}.Infrastructure.Services;
 
 public class ExternalService : IExternalService
 {

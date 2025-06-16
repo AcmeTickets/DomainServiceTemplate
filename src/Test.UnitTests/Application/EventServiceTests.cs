@@ -1,10 +1,10 @@
-using EventManagement.Application.Commands;
-using EventManagement.Application.Services;
-using EventManagement.Domain.Events;
-using EventManagement.Test.Mocks.Fakes;
+using {{DomainName}}.Application.Commands;
+using {{DomainName}}.Application.Services;
+using {{DomainName}}.Domain.Events;
+using {{DomainName}}.Test.Mocks.Fakes;
 using Xunit;
 
-namespace EventManagement.Test.UnitTests.Application;
+namespace {{DomainName}}.Test.UnitTests.Application;
 
 public class EventServiceTests
 {

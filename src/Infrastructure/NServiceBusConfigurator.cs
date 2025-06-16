@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 
-namespace EventManagement.Infrastructure
+namespace {{DomainName}}.Infrastructure
 {
     public static class NServiceBusConfigurator
     {

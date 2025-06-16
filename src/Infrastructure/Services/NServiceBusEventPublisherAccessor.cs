@@ -1,6 +1,6 @@
-    using EventManagement.Application.Services;
+    using {{DomainName}}.Application.Services;
 
-namespace EventManagement.Infrastructure.Services
+namespace {{DomainName}}.Infrastructure.Services
 {
     public static class NServiceBusEventPublisherAccessor
     {

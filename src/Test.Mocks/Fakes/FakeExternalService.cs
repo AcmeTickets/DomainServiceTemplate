@@ -1,6 +1,6 @@
-using EventManagement.Domain.Services;
+using {{DomainName}}.Domain.Services;
 
-namespace EventManagement.Test.Mocks.Fakes;
+namespace {{DomainName}}.Test.Mocks.Fakes;
 
 public class FakeExternalService : IExternalService
 {

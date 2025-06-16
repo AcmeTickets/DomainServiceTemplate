@@ -1,4 +1,4 @@
-namespace EventManagement.Domain.Events;
+namespace {{DomainName}}.Domain.Events;
 
 public class EventCreatedEvent : DomainEvent
 {

@@ -1,4 +1,4 @@
-namespace EventManagement.Application.Services;
+namespace {{DomainName}}.Application.Services;
 
 public interface ISenderService
 {

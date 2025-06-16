@@ -5,7 +5,11 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$DomainName,
     [Parameter(Mandatory=$true)]
-    [string]$DomainShortName
+    [string]$DomainShortName,
+    [Parameter(Mandatory=$false)]
+    [string]$ApiPort = "5271",
+    [Parameter(Mandatory=$false)]
+    [string]$MsgPort = "5281"
 )
 
 function Replace-InFile {
@@ -22,6 +26,8 @@ $files = Get-ChildItem -Path . -Recurse -File -Include *.cs,*.csproj,*.json,*.ym
 foreach ($file in $files) {
     Replace-InFile -Path $file.FullName -Old "{{DomainName}}" -New $DomainName
     Replace-InFile -Path $file.FullName -Old "{{DomainShortName}}" -New $DomainShortName
+    Replace-InFile -Path $file.FullName -Old "{{api_port}}" -New $ApiPort
+    Replace-InFile -Path $file.FullName -Old "{{msg_port}}" -New $MsgPort
 }
 
 # 2. Rename folders and subfolders
@@ -46,7 +52,7 @@ foreach ($kvp in $folderMap.GetEnumerator()) {
 # 3. Rename solution and project files if needed
 $solutionFile = Get-ChildItem -Path . -Filter "*.sln" | Select-Object -First 1
 if ($solutionFile) {
-    $newSolutionName = $solutionFile.Name -replace "EventManagement", $DomainName
+    $newSolutionName = $solutionFile.Name -replace "{{DomainName}}", $DomainName
     if ($solutionFile.Name -ne $newSolutionName) {
         Rename-Item -Path $solutionFile.FullName -NewName $newSolutionName
     }
@@ -55,7 +61,7 @@ if ($solutionFile) {
 # 4. Rename project files inside src
 $projFiles = Get-ChildItem -Path ./src -Recurse -Filter "*.csproj"
 foreach ($proj in $projFiles) {
-    $newProjName = $proj.Name -replace "EventManagement", $DomainName
+    $newProjName = $proj.Name -replace "{{DomainName}}", $DomainName
     if ($proj.Name -ne $newProjName) {
         Rename-Item -Path $proj.FullName -NewName $newProjName
     }

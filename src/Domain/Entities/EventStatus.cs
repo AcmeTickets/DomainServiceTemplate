@@ -1,4 +1,4 @@
-namespace EventManagement.Domain.Entities
+namespace {{DomainName}}.Domain.Entities
 {
     public enum EventStatus
     {

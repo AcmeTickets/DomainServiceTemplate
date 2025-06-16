@@ -1,13 +1,13 @@
-using EventManagement.Domain.Repositories;
-using EventManagement.Domain.Services;
-using EventManagement.Infrastructure.Repositories;
-using EventManagement.Infrastructure.Services;
+using {{DomainName}}.Domain.Repositories;
+using {{DomainName}}.Domain.Services;
+using {{DomainName}}.Infrastructure.Repositories;
+using {{DomainName}}.Infrastructure.Services;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using EventManagement.Application.Services;
+using {{DomainName}}.Application.Services;
 
-namespace EventManagement.Infrastructure;
+namespace {{DomainName}}.Infrastructure;
 
 public static class DependencyInjection
 {
