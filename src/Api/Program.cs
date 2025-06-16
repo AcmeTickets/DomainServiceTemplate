@@ -70,6 +70,7 @@ await app.RunAsync();
 EndpointConfiguration ConfigureNServiceBus(WebApplicationBuilder builder)
 {
     var endpointName = "{{DomainName}}.Api";
+    var messageEndpoint = "{{DomainName}}.Message";
     return builder.Environment.IsDevelopment()
         ? NServiceBusConfigurator.DevelopmentConfiguration(
             builder.Configuration,
