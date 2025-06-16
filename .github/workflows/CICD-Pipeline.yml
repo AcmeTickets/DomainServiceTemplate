@@ -13,6 +13,9 @@ on:
       - 'src/Message/**'
   workflow_dispatch:
 
+env:
+  RESOURCE_GROUP: acmetickets-rg
+
 jobs:
   build-and-publish-api:
     uses: AcmeTickets/.github/.github/workflows/Build and Publish Docker Image.yml@main
@@ -20,17 +23,28 @@ jobs:
     with:
       project_path: src/Api/Api.csproj
       dockerfile_path: src/Api/Dockerfile
-      image_name: ghcr.io/acmetickets/{{DomainShortName}}-api
+      image_name: ghcr.io/acmetickets/platformcomp-api
       target_port: {{api_port}}
 
   deploy-api:
     needs: build-and-publish-api
-    uses: AcmeTickets/.github/.github/workflows/Deploy API to Azure Container App.yml@main
-    secrets: inherit
-    with:
-      image_tag: ${{ needs.build-and-publish-api.outputs.image_tag }}
-      container_app_name: {{DomainShortName}}-api
-      target_port: {{api_port}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure CLI Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy to Azure Container App
+        env:
+          IMAGE: ${{ needs.build-and-publish-api.outputs.image_tag }}
+        run: |
+          az containerapp update \
+            --name {{DomainShortName}}-api \
+            --resource-group "$RESOURCE_GROUP" \
+            --image "$IMAGE" 
+       # --set-env-vars ASPNETCORE_ENVIRONMENT=Production AzureServiceBus__FullyQualifiedNamespace=acmeticketsasb.servicebus.windows.net COSMOSDB_ACCOUNT=platformcomposedb CosmosDb__DatabaseName=PlatformCompose CosmosDb__ContainerName=Events CosmosDb__AccountEndpoint=https://platformcomposedb.documents.azure.com:443/
 
   build-and-publish-message:
     uses: AcmeTickets/.github/.github/workflows/Build and Publish Docker Image.yml@main
@@ -39,15 +53,25 @@ jobs:
       project_path: src/Message/Message.csproj
       dockerfile_path: src/Message/Dockerfile
       image_name: ghcr.io/acmetickets/{{DomainShortName}}-msg
-      # If there is a port for message, use {{msg_port}}
+      # If there is a port for message, use 5002
       # If there is a Cosmos DB account, use {{cosmosdb_account}}
 
   deploy-message:
     needs: build-and-publish-message
-    uses: AcmeTickets/.github/.github/workflows/Deploy Messaging to Azure Container App.yml@main
-    secrets: inherit
-    with:
-      image_tag: ${{ needs.build-and-publish-message.outputs.image_tag }}
-      container_app_name: {{DomainShortName}}-msg
-      # If there is a port for message, use {{msg_port}}
-      # If there is a Cosmos DB account, use {{cosmosdb_account}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure CLI Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy to Azure Container App
+        env:
+          IMAGE: ${{ needs.build-and-publish-message.outputs.image_tag }}
+        run: |
+          az containerapp update \
+            --name {{DomainShortName}}-msg \
+            --resource-group "$RESOURCE_GROUP" \
+            --image "$IMAGE" 
+        # --set-env-vars ASPNETCORE_ENVIRONMENT=Production AzureServiceBus__FullyQualifiedNamespace=acmeticketsasb.servicebus.windows.net COSMOSDB_ACCOUNT=platformcomposedb CosmosDb__DatabaseName=PlatformCompose CosmosDb__ContainerName=Events CosmosDb__AccountEndpoint=https://platformcomposedb.documents.azure.com:443/
