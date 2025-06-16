@@ -14,7 +14,7 @@ env:
   CONTAINERAPPS_ENVIRONMENT: acmeticketsacadev
   AZURE_LOCATION: eastus
   REGISTRY: ghcr.io
-  APP_NAME: eventmanagement-api
+  APP_NAME: '{{DomainName}}-api'
 
 jobs:
   deploy:

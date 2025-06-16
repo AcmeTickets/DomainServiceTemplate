@@ -1,8 +1,8 @@
-using EventManagement.Domain.Entities;
-using EventManagement.Domain.Events;
+using {{DomainName}}.Domain.Entities;
+using {{DomainName}}.Domain.Events;
 using Xunit;
 
-namespace EventManagement.Test.UnitTests.Domain;
+namespace {{DomainName}}.Test.UnitTests.Domain;
 
 public class EventTests
 {
