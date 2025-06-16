@@ -6,10 +6,10 @@ param(
     [string]$DomainName,
     [Parameter(Mandatory=$true)]
     [string]$DomainShortName,
-    [Parameter(Mandatory=$false)]
-    [string]$ApiPort = "5271",
-    [Parameter(Mandatory=$false)]
-    [string]$MsgPort = "5281"
+    [Parameter(Mandatory=$true)]
+    [string]$ApiPort,
+    [Parameter(Mandatory=$true)]
+    [string]$MsgPort 
 )
 
 function Replace-InFile {
@@ -21,8 +21,9 @@ function Replace-InFile {
     (Get-Content $Path) -replace $Old, $New | Set-Content $Path
 }
 
-# 1. Replace template variables in all files
-$files = Get-ChildItem -Path . -Recurse -File -Include *.cs,*.csproj,*.json,*.yml,*.sln,*.md,*.xml
+# 1. Replace template variables in all files, EXCEPT this script itself
+$scriptName = $MyInvocation.MyCommand.Name
+$files = Get-ChildItem -Path . -Recurse -File -Include *.cs,*.csproj,*.json,*.yml,*.sln,*.md,*.xml | Where-Object { $_.Name -ne $scriptName }
 foreach ($file in $files) {
     Replace-InFile -Path $file.FullName -Old "{{DomainName}}" -New $DomainName
     Replace-InFile -Path $file.FullName -Old "{{DomainShortName}}" -New $DomainShortName
@@ -30,24 +31,6 @@ foreach ($file in $files) {
     Replace-InFile -Path $file.FullName -Old "{{msg_port}}" -New $MsgPort
 }
 
-# 2. Rename folders and subfolders
-$folderMap = @{
-    "Application" = "$DomainName`Application"
-    "Domain" = "$DomainName`Domain"
-    "Infrastructure" = "$DomainName`Infrastructure"
-    "InternalContracts" = "$DomainName`InternalContracts"
-    "Message" = "$DomainName`Message"
-    "Test.Mocks" = "$DomainName`TestMocks"
-    "Test.UnitTests" = "$DomainName`TestUnitTests"
-}
-
-foreach ($kvp in $folderMap.GetEnumerator()) {
-    $oldPath = Join-Path -Path "src" -ChildPath $kvp.Key
-    $newPath = Join-Path -Path "src" -ChildPath $kvp.Value
-    if (Test-Path $oldPath) {
-        Rename-Item -Path $oldPath -NewName $kvp.Value
-    }
-}
 
 # 3. Rename solution and project files if needed
 $solutionFile = Get-ChildItem -Path . -Filter "*.sln" | Select-Object -First 1
