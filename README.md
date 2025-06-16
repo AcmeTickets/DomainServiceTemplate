@@ -55,6 +55,14 @@ dotnet run --project src/Message/Message.csproj
 ### 5. CI/CD
 The template includes GitHub Actions workflows for building and deploying both services as container apps. Ports and image names are fully configurable.
 
+#### 5a.
+Have the platform team add your domain to the head script
+Add your domain specific resources to a new script that is called by the head script
+https://github.com/AcmeTickets/Platform/tree/main/.github
+
+#### 5b.
+Create a federated Id so that your repo can deploy the code to Azure. 
+
 ## Architecture
 - **API Service**: Handles HTTP requests, domain commands, and publishes events.
 - **Message Service**: Listens for domain events and processes them asynchronously.
