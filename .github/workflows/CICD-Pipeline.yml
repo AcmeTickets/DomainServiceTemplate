@@ -23,7 +23,7 @@ jobs:
     with:
       project_path: src/Api/Api.csproj
       dockerfile_path: src/Api/Dockerfile
-      image_name: ghcr.io/acmetickets/platformcomp-api
+      image_name: ghcr.io/acmetickets/{{DomainShortName}}-api
       target_port: {{api_port}}
 
   deploy-api:
