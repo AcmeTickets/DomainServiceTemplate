@@ -1,0 +1,40 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "name": "Messaging Launch",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/Message/bin/Debug/net9.0/Message.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Message",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "env": {
+         "DOTNET_ENVIRONMENT": "Development"
+         }
+    },
+    {
+      "name": "API Launch",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/Api/bin/Debug/net9.0/Api.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Api",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "env": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "API & Messaging",
+      "configurations": ["API Launch", "Messaging Launch"]
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+name: CI-CD Pipeline
+
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  
+on:
+  push:
+    paths:
+      - 'src/Api/**'
+      - 'src/Message/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-publish-api:
+    uses: AcmeTickets/.github/.github/workflows/Build and Publish Docker Image.yml@main
+    secrets: inherit
+    with:
+      project_path: src/Api/Api.csproj
+      dockerfile_path: src/Api/Dockerfile
+      image_name: ghcr.io/acmetickets/eventmgmt-api
+      target_port: 5271
+
+  deploy-api:
+    needs: build-and-publish-api
+    uses: AcmeTickets/.github/.github/workflows/Deploy API to Azure Container App.yml@main
+    secrets: inherit
+    with:
+      image_tag: ${{ needs.build-and-publish-api.outputs.image_tag }}
+      container_app_name: eventmgmt-api
+      target_port: 5271
+
+  build-and-publish-message:
+    uses: AcmeTickets/.github/.github/workflows/Build and Publish Docker Image.yml@main
+    secrets: inherit
+    with:
+      project_path: src/Message/Message.csproj
+      dockerfile_path: src/Message/Dockerfile
+      image_name: ghcr.io/acmetickets/eventmgmt-msg
+
+  deploy-message:
+    needs: build-and-publish-message
+    uses: AcmeTickets/.github/.github/workflows/Deploy Messaging to Azure Container App.yml@main
+    secrets: inherit
+    with:
+      image_tag: ${{ needs.build-and-publish-message.outputs.image_tag }}
+      container_app_name: eventmgmt-msg
