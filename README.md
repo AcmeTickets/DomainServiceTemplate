@@ -18,8 +18,12 @@ git clone <this-repo-url>
 cd DomainServiceTemplate
 ```
 
+
 ### 2. Apply Your Domain
 Run the PowerShell script in the root directory to set your domain name, short name, ports, and Cosmos DB account:
+
+
+Run from powershell without having the project open.
 
 ```powershell
 # Example usage:
