@@ -1,0 +1,49 @@
+name: Apply Domain Template
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain_name:
+        description: 'DomainName (PascalCase)'
+        required: true
+      domain_short_name:
+        description: 'DomainShortName (short, lowercase)'
+        required: true
+      api_port:
+        description: 'API Port (default: 5271)'
+        required: false
+        default: '5271'
+      msg_port:
+        description: 'Message Port (default: 5281)'
+        required: false
+        default: '5281'
+
+jobs:
+  apply-template:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Make script executable
+        run: chmod +x .github/scripts/apply-domain-template.sh
+
+      - name: Apply domain template
+        run: |
+          .github/scripts/apply-domain-template.sh "${{ github.event.inputs.domain_name }}" "${{ github.event.inputs.domain_short_name }}" "${{ github.event.inputs.api_port }}" "${{ github.event.inputs.msg_port }}"
+
+      - name: Build solution
+        run: dotnet build
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Apply domain template for ${{ github.event.inputs.domain_name }}" || echo "No changes to commit"
+          git push
