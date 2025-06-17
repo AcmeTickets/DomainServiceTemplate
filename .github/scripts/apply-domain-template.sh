@@ -30,9 +30,32 @@ for d in Application Domain Infrastructure InternalContracts Message Test.Mocks 
 done
 cd ..
 
-# 3. Rename solution and project files
-find . -name "*{{DomainName}}*" -exec bash -c 'mv "$0" "${0//\{\{DomainName\}\}/'$DOMAIN_NAME'}"' {} \;
-find ./src -name "*{{DomainName}}*.csproj" -exec bash -c 'mv "$0" "${0//\{\{DomainName\}\}/'$DOMAIN_NAME'}"' {} \;
+# 3. Rename solution and project files if needed
+solution_file=$(find . -maxdepth 1 -name "*.sln" | head -n 1)
+if [[ -n "$solution_file" ]]; then
+  new_solution_name=$(echo "$solution_file" | sed "s/{{DomainName}}/$DOMAIN_NAME/g")
+  if [[ "$solution_file" != "$new_solution_name" ]]; then
+    mv "$solution_file" "$new_solution_name"
+  fi
+fi
+
+# 4. Rename project files inside src
+find ./src -name "*{{DomainName}}*.csproj" | while read -r proj; do
+  new_proj_name=$(echo "$proj" | sed "s/{{DomainName}}/$DOMAIN_NAME/g")
+  if [[ "$proj" != "$new_proj_name" ]]; then
+    mv "$proj" "$new_proj_name"
+  fi
+done
+
+# 5. Create appsettings.Development.json in each project folder if it doesn't exist, using appsettings.json as a template
+for folder in ./src/Api ./src/App ./src/Message; do
+  appsettings_path="$folder/appsettings.json"
+  devsettings_path="$folder/appsettings.Development.json"
+  if [[ -f "$appsettings_path" && ! -f "$devsettings_path" ]]; then
+    cp "$appsettings_path" "$devsettings_path"
+    echo "Created $devsettings_path from $appsettings_path"
+  fi
+done
 
 echo "Domain template applied. Folders, files, and contents updated."
 echo "WARNING: You MUST manually set your secrets and environment-specific values in the appsettings.json and appsettings.Development.json files for each service!"

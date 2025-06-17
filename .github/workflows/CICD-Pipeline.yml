@@ -1,6 +1,5 @@
 name: CI-CD Pipeline
 
-
 permissions:
   contents: read
   packages: write
@@ -15,6 +14,7 @@ on:
 
 env:
   RESOURCE_GROUP: acmetickets-rg
+  APPCONFIG_NAME: AcmeTicketsInfraConfiguration
 
 jobs:
   build-and-publish-api:
@@ -36,6 +36,18 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Fetch App Config Values
+        id: appconfig
+        run: |
+          az appconfig kv list --name "$APPCONFIG_NAME" --key "{{DomainShortName}}:*" --query "[].{key:key, value:value}" -o tsv > config.txt
+          echo "--- config.txt contents ---"
+          cat config.txt
+          while IFS=$'\t' read -r key value; do
+            envname=$(echo $key | sed "s/^{{DomainShortName}}://")
+            echo "$envname=$value" >> $GITHUB_ENV
+          done < config.txt
+
       - name: Deploy to Azure Container App
         env:
           IMAGE: ${{ needs.build-and-publish-api.outputs.image_tag }}
@@ -43,8 +55,8 @@ jobs:
           az containerapp update \
             --name {{DomainShortName}}-api \
             --resource-group "$RESOURCE_GROUP" \
-            --image "$IMAGE" 
-       # --set-env-vars ASPNETCORE_ENVIRONMENT=Production AzureServiceBus__FullyQualifiedNamespace=acmeticketsasb.servicebus.windows.net COSMOSDB_ACCOUNT=platformcomposedb CosmosDb__DatabaseName=PlatformCompose CosmosDb__ContainerName=Events CosmosDb__AccountEndpoint=https://platformcomposedb.documents.azure.com:443/
+            --image "$IMAGE" \
+            --set-env-vars AzureServiceBus__FullyQualifiedNamespace=$AzureServiceBus__FullyQualifiedNamespace CosmosDb__DatabaseName=$CosmosDb__DatabaseName CosmosDb__ContainerName=$CosmosDb__ContainerName CosmosDb__AccountEndpoint=$CosmosDb__AccountEndpoint
 
   build-and-publish-message:
     uses: AcmeTickets/.github/.github/workflows/Build and Publish Docker Image.yml@main
@@ -66,6 +78,18 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Fetch App Config Values
+        id: appconfig
+        run: |
+          az appconfig kv list --name "$APPCONFIG_NAME" --key "{{DomainShortName}}:*" --query "[].{key:key, value:value}" -o tsv > config.txt
+          echo "--- config.txt contents ---"
+          cat config.txt
+          while IFS=$'\t' read -r key value; do
+            envname=$(echo $key | sed "s/^{{DomainShortName}}://")
+            echo "$envname=$value" >> $GITHUB_ENV
+          done < config.txt
+
       - name: Deploy to Azure Container App
         env:
           IMAGE: ${{ needs.build-and-publish-message.outputs.image_tag }}
@@ -73,5 +97,5 @@ jobs:
           az containerapp update \
             --name {{DomainShortName}}-msg \
             --resource-group "$RESOURCE_GROUP" \
-            --image "$IMAGE" 
-        # --set-env-vars ASPNETCORE_ENVIRONMENT=Production AzureServiceBus__FullyQualifiedNamespace=acmeticketsasb.servicebus.windows.net COSMOSDB_ACCOUNT=platformcomposedb CosmosDb__DatabaseName=PlatformCompose CosmosDb__ContainerName=Events CosmosDb__AccountEndpoint=https://platformcomposedb.documents.azure.com:443/
+            --image "$IMAGE" \
+            --set-env-vars AzureServiceBus__FullyQualifiedNamespace=$AzureServiceBus__FullyQualifiedNamespace CosmosDb__DatabaseName=$CosmosDb__DatabaseName CosmosDb__ContainerName=$CosmosDb__ContainerName CosmosDb__AccountEndpoint=$CosmosDb__AccountEndpoint
