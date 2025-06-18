@@ -18,6 +18,11 @@ on:
         required: false
         default: '5281'
 
+permissions:
+  contents: write
+  packages: read
+  workflows: write
+
 jobs:
   apply-template:
     runs-on: ubuntu-latest
@@ -25,25 +30,43 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
-
       - name: Make script executable
         run: chmod +x .github/scripts/apply-domain-template.sh
 
       - name: Apply domain template
         run: |
           .github/scripts/apply-domain-template.sh "${{ github.event.inputs.domain_name }}" "${{ github.event.inputs.domain_short_name }}" "${{ github.event.inputs.api_port }}" "${{ github.event.inputs.msg_port }}"
+          
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: '9.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+            path: ~/.nuget/packages
+            key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+            restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Remove existing GitHub NuGet source
+        run: dotnet nuget remove source github || true
+
+      - name: Add GitHub NuGet source with GitHub Token
+        run: dotnet nuget add source https://nuget.pkg.github.com/AcmeTickets/index.json --name github --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+
+      - name: Restore dependencies
+        run: dotnet restore
 
       - name: Build solution
-        run: dotnet build
+        run: dotnet build --configuration Release --no-restore
 
       - name: Commit and push changes
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Apply domain template for ${{ github.event.inputs.domain_name }}" || echo "No changes to commit"
-          git push
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "Apply domain template for ${{ github.event.inputs.domain_name }}" || echo "No changes to commit"
+            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main

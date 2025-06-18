@@ -39,6 +39,17 @@ This script will:
 - Rename folders and files to match your domain
 - Update configuration and workflow files
 
+#### 2a. Update the CICD File
+Open the project in VSCode and run this prompt in GitHub Copilot
+
+Replace all template placeholders in the file CICD-Pipeline.yml as follows:
+
+Replace every occurrence of {{DomainName}} with HumanResources
+Replace every occurrence of {{DomainShortName}} with humanrsr
+Replace every occurrence of {{api_port}} with 5275
+Replace every occurrence of {{msg_port}} with 5276
+Only update these placeholders—do not change any other content or formatting in the file.
+
 ### 3. Configure Environment Variables
 Set your Cosmos DB account and other secrets as needed. For example, update `appsettings.Development.json` with your `AccountKey` and other values.
 
